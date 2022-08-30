@@ -12,109 +12,62 @@ Please cite:
 ```
 
 # Automated Metrics
-A standalone implementations of automated evaluation metrics for evaluating the quality of generated samples on the SC09 dataset in `metrics.py`. Following [Kong et al. (2021)](https://arxiv.org/pdf/2009.09761.pdf), Inception Score (IS), Modified Inception Score (mIS), AM Score (AM) and the number of statistically different bins score (NDB) are implemented. Details about the metrics and the procedure is defined as follows:
+A standalone implementations of automated evaluation metrics for evaluating the quality of generated samples on the SC09 dataset in `metrics.py`. Following [Kong et al. (2021)](https://arxiv.org/pdf/2009.09761.pdf), the metrics and the procedure is defined as follows:
 * Fréchet Inception Distance (FID): uses the classifier to compare moments of generated and real samples in feature space.
 * Inception Score (IS): measures both quality and diversity of generated samples, and favoring samples that the classifier is confident on.
 * Modified Inception Score (mIS): provides a measure of both intra-class in addition to inter-class diversity.
 * AM Score: uses the marginal label distribution of training data compared to IS.
-* Number of statistically different bins score (NDB): the number of bins that contain statistically different proportion of samples between training samples and generated samples.
+* Number of statistically different bins score (NDB): the number of bins that contain statistically different proportion of samples between training samples and generated samples. 
 
 ## SC09 Classifier Training
-We use a modified version of the training/testing script provided by the [pytorch-speech-commands](https://github.com/tugstugi/pytorch-speech-commands) repository, which we include under `state-spaces/sashimi/sc09_classifier`. Following [Kong et al. (2021)](https://arxiv.org/pdf/2009.09761.pdf), we used a ResNeXt model trained on SC09 spectrograms. 
+A modified version of the training/testing script provided by the [pytorch-speech-commands](https://github.com/tugstugi/pytorch-speech-commands) repository, following [Kong et al. (2021)](https://arxiv.org/pdf/2009.09761.pdf).
 
 This classifier has two purposes:
 1. To calculate the automated metrics, each SC09 audio clip must be converted into a feature vector. 
-2. Following [Donahue et al. (2019)](https://arxiv.org/pdf/1802.04208.pdf), we use classifier confidence as a proxy for the quality and intelligibility of the generated audio. Roughly, we sample a large number of samples from each model, and then select the top samples (as ranked by classifier confidence) per class (as assigned by the classifier). These are then used in MOS experiments.
+2. Following [Donahue et al. (2019)](https://arxiv.org/pdf/1802.04208.pdf), a classifier confidence is used as a proxy for the quality and intelligibility of the generated audio. Roughly, a large number of samples from each model are sampled, and then the top samples are selected (as ranked by classifier confidence) per class (as assigned by the classifier).
 
 ### Install Dependencies
-Requirements are included in the `requirements.txt` file for reference. We recommend running your `torch` and `torchvision` install using whatever best practices you follow before installing other requirements.
+Requirements are included in the `requirements.txt` file for reference excluding `torch` and `torchvision`. (It's been tested with `torch` version `1.9.0+cu102`.)
 ```bash
 pip install -r requirements.txt
 ```
-> This code is provided as-is, so depending on your `torch` version, you may need to make slight tweaks to the code to get it running. It's been tested with `torch` version `1.9.0+cu102`.
 
 ### Download Dataset
-For convenience, we recommend redownloading the Speech Commands dataset for classifier training using the commands below. Downloading and extraction should take a few minutes.
+For convenience, it is recommend redownloading the Speech Commands dataset for classifier training using the commands below. Downloading and extraction should take a few minutes.
 ```bash
-cd sashimi/sc09_classifier/
+cd ./sc09_classifier/
 bash download_speech_commands_dataset.sh
 ```
 
-### Train
-To train the classifier, run the following command:
+### Checkpoint
+To train the classifier from the scratch, run the following command:
 ```bash
 mkdir checkpoints/
 python train_speech_commands.py --batch-size 96 --learning-rate 1e-2
 ```
-Training is fast and should take only a few hours on a T4 GPU. The best model checkpoint should be saved under `state-spaces/sashimi/sc09_classifier/` with a leading timestamp. Note that we provide these instructions for completeness, and you should be able to reuse our classifier checkpoint directly (see `Downloads` next).
+The best model checkpoint should be saved under `./sc09_classifier/` with a leading timestamp. 
 
-## Downloads
-To reproduce our evaluation results on the SC09 dataset, we provide sample directories, a classifier checkpoint and a preprocessed cache of classifier outputs.
-
-1. _Samples:_ We provide all samples generated by all models on the [Huggingface Hub](https://huggingface.co/krandiash/sashimi-release) under `samples/`. Download and unzip all the sample directories in `state-spaces/sashimi/samples/`.
-2. _Classifier:_ You can use our SC09 classifier checkpoint rather than training your own. We provide this for convenience on the [Huggingface Hub](https://huggingface.co/krandiash/sashimi-release) at `sc09_classifier/resnext.pth`. This model achieves `98.08%` accuracy on the SC09 test set. Download this checkpoint and place it in `state-spaces/sashimi/sc09_classifier/`.
-3. _Cache:_ We provide a cache of classifier outputs that are used to speed up automated evaluation, as well as used in MTurk experiments for gathering mean opinion scores. You can find these on the [Huggingface Hub](https://huggingface.co/krandiash/sashimi-release) at `sc09_classifier/cache`. Download and place the `cache` directory under `state-spaces/sashimi/sc09_classifier/`.
+It's also possible to reuse the classifier checkpoint and cache files provided by the authors directly on the [Huggingface Hub](https://huggingface.co/krandiash/sashimi-release) at `sc09_classifier/resnext.pth`. This model achieves `98.08%` accuracy on the SC09 test set. Download this checkpoint and cache file and place place them in `./sc09_classifier/`.
 
 At the end of this your directory structure should look something like this:
 ```bash
-state-spaces/
-├── sashimi/
-│   ├── samples/
-│   │   ├── sc09/
-│   │   ├── youtubemix/
-│   ├── sc09_classifier/
-│   │   ├── resnext.pth
-│   │   ├── cache/
+samples/
+├── sc09/
+sc09_classifier/
+├── resnext.pth
 ...
 ```
 
 ## Calculating Automated Metrics
-We provide instructions for calculating the automated SC09 metrics next. 
+Instructions for calculating the automated SC09 metrics 
 
 ### Dataset Metrics
 To generate the automated metrics for the dataset, run the following command:
 ```bash
 python test_speech_commands.py resnext.pth
 ```
-If you didn't correctly place the `cache` folder under `state-spaces/sashimi/sc09_classifier`, this will be a little slow to run the first time, as it caches features and predictions (`train_probs.npy`, `test_probs.npy`, `train_activations.npy`, `test_activations.npy`) for the train and test sets under `state-spaces/sashimi/sc09_classifier/cache/`. Subsequent runs reuse this and are much faster.
+If you didn't correctly place the `cache` folder under `./sc09_classifier`, this will be a little slow to run the first time, as it caches features and predictions (`train_probs.npy`, `test_probs.npy`, `train_activations.npy`, `test_activations.npy`) for the train and test sets under `./sc09_classifier/cache/`. Subsequent runs reuse this and are much faster.
 
-### Metrics on Autoregressive Models (SaShiMi, SampleRNN, WaveNet)
-For autoregressive models, we follow a threshold tuning procedure that is outlined in `Appendix C.3` of our paper. We generated `10240` samples for each model, using `5120` to tune thresholds for rejecting samples with the lowest and highest likelihoods, and evaluating the metrics on the `5120` samples that are held out. This is all taken care of automatically by the `test_speech_commands.py` script (with the `--threshold` flag passed in).
-
-```bash
-# SaShiMi (4.1M parameters)
-python test_speech_commands.py --sample-dir ../samples/sc09/10240-sashimi-8-glu/ --threshold resnext.pth
-
-# SampleRNN (35.0M parameters)
-python test_speech_commands.py --sample-dir ../samples/sc09/10240-samplernn-3/ --threshold resnext.pth
-
-# WaveNet (4.2M parameters)
-python test_speech_commands.py --sample-dir ../samples/sc09/10240-wavenet-1024/ --threshold resnext.pth
-```
-> _Important:_ the commands above assume that samples inside the `sample-dir` directory are sorted by log-likelihoods (in increasing order), since the `--threshold` flag is being passed. Our autoregressive generation script does this automatically, but if you generated samples manually through a separate script, you should sort them by log-likelihoods before running the above commands. If you cannot sort the samples by log-likelihoods, you can simply omit the `--threshold` flag.
-
-### Metrics on Non-Autoregressive Models (DiffWave variants, WaveGAN)
-For DiffWave models and WaveGAN (which don't provide exact likelihoods), we simply calculate metrics directly on `2048` samples.
-```bash
-# DiffWave with WaveNet backbone (24.1M parameters), trained for 500K steps
-python test_speech_commands.py --sample-dir ../samples/sc09/2048-diffwave-500k/ resnext.pth
-# DiffWave with WaveNet backbone (24.1M parameters), trained for 1M steps
-python test_speech_commands.py --sample-dir ../samples/sc09/2048-diffwave-1m/ resnext.pth
-# Small DiffWave with WaveNet backbone (6.8M parameters), trained for 500K steps
-python test_speech_commands.py --sample-dir ../samples/sc09/2048-diffwave-small-500k/ resnext.pth
-
-# DiffWave with bidirectional SaShiMi backbone (23.0M parameters), trained for 500K steps
-python test_speech_commands.py --sample-dir ../samples/sc09/2048-sashimi-diffwave-500k/ resnext.pth
-# DiffWave with bidirectional SaShiMi backbone (23.0M parameters), trained for 800K steps
-python test_speech_commands.py --sample-dir ../samples/sc09/2048-sashimi-diffwave-800k/ resnext.pth
-# Small DiffWave with bidirectional SaShiMi backbone (7.5M parameters), trained for 500K steps
-python test_speech_commands.py --sample-dir ../samples/sc09/2048-sashimi-diffwave-small-500k/ resnext.pth
-
-# Small DiffWave with unidirectional SaShiMi backbone (7.1M parameters), trained for 500K steps
-python test_speech_commands.py --sample-dir ../samples/sc09/2048-sashimi-diffwave-small-uni-500k/ resnext.pth
-
-# WaveGAN model (19.1M parameters)
-python test_speech_commands.py --sample-dir ../samples/sc09/2048-wavegan/ resnext.pth
-```
+### Examples
 
 # References:
