@@ -69,5 +69,18 @@ python test_speech_commands.py resnext.pth
 If you didn't correctly place the `cache` folder under `./sc09_classifier`, this will be a little slow to run the first time, as it caches features and predictions (`train_probs.npy`, `test_probs.npy`, `train_activations.npy`, `test_activations.npy`) for the train and test sets under `./sc09_classifier/cache/`. Subsequent runs reuse this and are much faster.
 
 ### Examples
+| System    |  Generator   | FID | Inception  | mInception | AM | 
+|-----------|----|-----|------------|---------|--------|
+| wavenet   | AR   | 4.93  |2.39      | 6.06     |1.45  |
+| samplernn | AR   | 8.97 |1.71      | 2.98      |1.77  |
+|sashimi    | AR   |  2.03| 4.31     | 25.88   | 0.88  |
+
+* Note: AR models here are based on the generated results from s4 v2 package.
 
 # References:
+[1] S4 github: https://github.com/HazyResearch/state-spaces
+
+# TODO
+
+- [ ] Add FAD
+- [ ] Add results for diffusion based generators
