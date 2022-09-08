@@ -75,7 +75,7 @@ For generators which don't provide exact likelihoods, we can simply calculate me
 python test_speech_commands.py --sample-dir /samples/sc09/2048-diffwave/ resnext.pth
 ```
 
-### Metrics on Autoregressive Models (DiffWave variants, WaveGAN etc)
+### Metrics on Autoregressive Models
 For autoregressive models, we can follow a threshold tuning procedure: first, we generated 10240 samples for each model, using 5120 to tune thresholds for rejecting samples with the lowest and highest likelihoods, and evaluating the metrics on the 5120 samples that are held out. This is all taken care of automatically by the test_speech_commands.py script (with the --threshold flag passed in).
 ```
 # SaShiMi (4.1M parameters)
