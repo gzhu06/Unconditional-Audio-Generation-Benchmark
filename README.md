@@ -13,11 +13,19 @@ Please cite:
 
 # Automated Metrics
 A standalone implementations of automated evaluation metrics for evaluating the quality of generated samples on the SC09 dataset in `metrics.py`. Following [Kong et al. (2021)](https://arxiv.org/pdf/2009.09761.pdf), the metrics and the procedure is defined as follows:
-* Fréchet Inception Distance (FID): uses the classifier to compare moments of generated and real samples in feature space.
-* Inception Score (IS): measures both quality and diversity of generated samples, and favoring samples that the classifier is confident on.
-* Modified Inception Score (mIS): provides a measure of both intra-class in addition to inter-class diversity.
-* AM Score: uses the marginal label distribution of training data compared to IS.
-* Number of statistically different bins score (NDB): the number of bins that contain statistically different proportion of samples between training samples and generated samples. 
+## Fréchet Inception Distance (FID)
+
+uses the classifier to compare moments of generated and real samples in feature space.
+
+## Inception Score (IS) 
+IS measures the quality of the generated data and detects whether there is a mode collapse by using a pretrained domain-specific classifier.  It is computed as the KL divergence between the conditional probability p(y|x) and marginal probability p(y),
+
+## Modified Inception Score (mIS)
+provides a measure of both intra-class in addition to inter-class diversity.
+## AM Score
+uses the marginal label distribution of training data compared to IS.
+## Number of statistically different bins score (NDB)
+the number of bins that contain statistically different proportion of samples between training samples and generated samples. 
 
 ## SC09 Classifier Training
 A modified version of the training/testing script provided by the [pytorch-speech-commands](https://github.com/tugstugi/pytorch-speech-commands) repository, following [Kong et al. (2021)](https://arxiv.org/pdf/2009.09761.pdf).
@@ -61,6 +69,19 @@ sc09_classifier/
 ## Calculating Automated Metrics
 Instructions for calculating the automated SC09 metrics 
 
+### Metrics on Non-Autoregressive Models
+For generators which don't provide exact likelihoods, we can simply calculate metrics directly on 2048 samples
+```
+python test_speech_commands.py --sample-dir /samples/sc09/2048-diffwave/ resnext.pth
+```
+
+### Metrics on Autoregressive Models (DiffWave variants, WaveGAN etc)
+For autoregressive models, we can follow a threshold tuning procedure: first, we generated 10240 samples for each model, using 5120 to tune thresholds for rejecting samples with the lowest and highest likelihoods, and evaluating the metrics on the 5120 samples that are held out. This is all taken care of automatically by the test_speech_commands.py script (with the --threshold flag passed in).
+```
+# SaShiMi (4.1M parameters)
+python test_speech_commands.py --sample-dir /samples/sc09/10240-sashimi/ --threshold resnext.pth
+```
+
 ### Dataset Metrics
 To generate the automated metrics for the dataset, run the following command:
 ```bash
@@ -74,11 +95,13 @@ If you didn't correctly place the `cache` folder under `./sc09_classifier`, this
 | wavenet   | AR   | 4.93  |2.39      | 6.06     |1.45  |
 | samplernn | AR   | 8.97 |1.71      | 2.98      |1.77  |
 |sashimi    | AR   |  2.03| 4.31     | 25.88   | 0.88  |
+|[diffwave](https://github.com/philsyn/DiffWave-unconditional)  | diffusion|1.80|5.70|51.88|0.65|
 
-* Note: AR models here are based on the generated results from s4 v2 package.
+* Note: AR models here are based on the generated results from s4 v2 package. Diffwave is based on the provided pretrained model.
 
 # References:
 [1] S4 github: https://github.com/HazyResearch/state-spaces
+[2] Tun-Min Hung et al. A Benchmarking Initiative for Audio-domain Music Generation using the {FreeSound Loop Dataset}
 
 # TODO
 
