@@ -96,12 +96,17 @@ If you didn't correctly place the `cache` folder under `./sc09_classifier`, this
 | samplernn | AR   | 8.97 |1.71      | 2.98      |1.77  |
 |sashimi    | AR   |  2.03| 4.31     | 25.88   | 0.88  |
 |[diffwave](https://github.com/philsyn/DiffWave-unconditional)  | diffusion|1.80|5.70|51.88|0.65|
+|[audiodiff](https://github.com/archinetai/audio-diffusion-pytorch)  | diffusion|1.51|7.07|105.8|0.471|
 
-* Note: AR models here are based on the generated results from s4 v2 package. Diffwave is based on the provided pretrained model.
+* Note: AR models here are based on the generated results from s4 v2 package. 
+* Diffwave is based on the provided pretrained model (1M steps).
+* AudioDiff is based on a model train from scratch (now at 300k steps, will update at 1M steps).
 
 # References:
-[1] S4 github: https://github.com/HazyResearch/state-spaces
+[1] S4 github repo: https://github.com/HazyResearch/state-spaces
 [2] Tun-Min Hung et al. A Benchmarking Initiative for Audio-domain Music Generation using the {FreeSound Loop Dataset}
+[3] Unconditional Diffwave github repo: https://github.com/philsyn/DiffWave-unconditional
+[4] AudioDiff github repo: https://github.com/archinetai/audio-diffusion-pytorch
 
 # TODO
 
