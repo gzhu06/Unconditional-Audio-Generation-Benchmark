@@ -103,9 +103,9 @@ If you didn't correctly place the `cache` folder under `./sc09_classifier`, this
 * AudioDiff is based on a model train from scratch (now at 300k steps, will update at 1M steps).
 
 # References:
-[1] S4 github repo: https://github.com/HazyResearch/state-spaces
-[2] Tun-Min Hung et al. A Benchmarking Initiative for Audio-domain Music Generation using the {FreeSound Loop Dataset}
-[3] Unconditional Diffwave github repo: https://github.com/philsyn/DiffWave-unconditional
+[1] S4 github repo: https://github.com/HazyResearch/state-spaces \
+[2] Tun-Min Hung et al. A Benchmarking Initiative for Audio-domain Music Generation using the {FreeSound Loop Dataset} \
+[3] Unconditional Diffwave github repo: https://github.com/philsyn/DiffWave-unconditional \
 [4] AudioDiff github repo: https://github.com/archinetai/audio-diffusion-pytorch
 
 # TODO
