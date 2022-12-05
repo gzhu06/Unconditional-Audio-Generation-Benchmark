@@ -90,7 +90,7 @@ python test_speech_commands.py resnext.pth
 If you didn't correctly place the `cache` folder under `./sc09_classifier`, this will be a little slow to run the first time, as it caches features and predictions (`train_probs.npy`, `test_probs.npy`, `train_activations.npy`, `test_activations.npy`) for the train and test sets under `./sc09_classifier/cache/`. Subsequent runs reuse this and are much faster.
 
 ### Examples
-| System    |  Generator   | FID | Inception  | mInception | AM | 
+| System    |  Generator   | FID(↓) | Inception(↑)  | mInception(↑) | AM(↓) | 
 |-----------|----|-----|------------|---------|--------|
 | wavenet   | AR   | 4.93  |2.39      | 6.06     |1.45  |
 | samplernn | AR   | 8.97 |1.71      | 2.98      |1.77  |
