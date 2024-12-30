@@ -395,7 +395,7 @@ if args.threshold:
     # Split into two parts, one for tuning thresholds and one for calculating metrics
     val_indices = sorted(np.random.choice(len(samples_probs), size=n_val, replace=False))
     test_indices = sorted(np.array(list(set(range(10240)) - set(val_indices))))
-    
+
     samples_probs_val = samples_probs[val_indices]
     samples_probs_test = samples_probs[test_indices]
 
